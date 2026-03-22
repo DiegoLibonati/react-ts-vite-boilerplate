@@ -1,4 +1,3 @@
-
 /** @type {import('jest').Config} */
 
 const config = {
@@ -7,11 +6,15 @@ const config = {
   rootDir: ".",
   roots: ["<rootDir>/__tests__"],
   setupFilesAfterEnv: ["<rootDir>/__tests__/jest.setup.ts"],
-  testMatch: ["**/*.test.ts", "**/*.spec.ts"],
+  testMatch: [
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+  ],
   moduleNameMapper: {
     "\\.(css|scss)$": "<rootDir>/__tests__/__mocks__/style.mock.ts",
-    "\\.(png|jpg|jpeg|gif|svg|webp)$":
-      "<rootDir>/__tests__/__mocks__/file.mock.ts",
+    "\\.(png|jpg|jpeg|gif|svg|webp)$": "<rootDir>/__tests__/__mocks__/file.mock.ts",
     "^@/(.*)$": "<rootDir>/src/$1",
     "^@tests/(.*)$": "<rootDir>/__tests__/$1",
   },
@@ -19,9 +22,9 @@ const config = {
     "^.+\\.tsx?$": ["ts-jest", { tsconfig: "tsconfig.test.json" }],
   },
   collectCoverageFrom: [
-    "src/**/*.ts",
+    "src/**/*.{ts,tsx}",
     "!src/**/*.d.ts",
-    "!src/index.ts",
+    "!src/index.tsx",
     "!src/types/**/*.ts",
   ],
   coverageDirectory: "coverage",
@@ -36,6 +39,7 @@ const config = {
   },
   clearMocks: true,
   restoreMocks: true,
+  resetMocks: true,
 };
 
 export default config;
