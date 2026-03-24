@@ -75,17 +75,17 @@ describe("UserCard", () => {
 
   it("should render contact info inside an address element", () => {
     const { container } = renderComponent();
-    expect(container.querySelector("address.user-card__contact")).toBeInTheDocument();
+    expect(container.querySelector<HTMLElement>("address.user-card__contact")).toBeInTheDocument();
   });
 
   it("should render name and username inside a header element", () => {
     const { container } = renderComponent();
-    expect(container.querySelector("header.user-card__header")).toBeInTheDocument();
+    expect(container.querySelector<HTMLElement>("header.user-card__header")).toBeInTheDocument();
   });
 
   it("should render company inside a footer element", () => {
     const { container } = renderComponent();
-    expect(container.querySelector("footer.user-card__footer")).toBeInTheDocument();
+    expect(container.querySelector<HTMLElement>("footer.user-card__footer")).toBeInTheDocument();
   });
 
   it("should render with a custom name", () => {
