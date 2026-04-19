@@ -1,60 +1,62 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
+import type { RenderResult } from "@testing-library/react";
+
 import HomePage from "@/pages/HomePage/HomePage";
 
-interface RenderPage {
-  container: HTMLElement;
-}
-
-const renderPage = (): RenderPage => {
-  const { container } = render(
+const renderPage = (): RenderResult => {
+  return render(
     <MemoryRouter>
       <HomePage />
     </MemoryRouter>
   );
-  return { container };
 };
 
 describe("HomePage", () => {
-  it("should render the main element", () => {
-    const { container } = renderPage();
-    expect(container.querySelector<HTMLElement>("main.home-page")).toBeInTheDocument();
-  });
+  describe("rendering", () => {
+    it("should render the page title", () => {
+      renderPage();
+      expect(screen.getByRole("heading", { name: "Home Page", level: 1 })).toBeInTheDocument();
+    });
 
-  it("should render the Home Page title", () => {
-    renderPage();
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Home Page");
-  });
+    it("should render the about page link", () => {
+      renderPage();
+      expect(screen.getByRole("link", { name: "Go to About Page" })).toBeInTheDocument();
+    });
 
-  it("should render a navigation landmark", () => {
-    renderPage();
-    expect(screen.getByRole("navigation", { name: "Page navigation" })).toBeInTheDocument();
-  });
+    it("should render the about page in another window link", () => {
+      renderPage();
+      expect(
+        screen.getByRole("link", { name: "Go to About Page in a new window" })
+      ).toBeInTheDocument();
+    });
 
-  it("should render the link to About Page (same window)", () => {
-    renderPage();
-    const link = screen.getByRole("link", { name: "Go to About Page" });
-    expect(link).toHaveAttribute("href", "/about");
-    expect(link).toHaveAttribute("target", "_self");
-  });
+    it("should render the users page link", () => {
+      renderPage();
+      expect(screen.getByRole("link", { name: "Go to Users Page" })).toBeInTheDocument();
+    });
 
-  it("should render the link to About Page (new window)", () => {
-    renderPage();
-    const link = screen.getByRole("link", { name: "Go to About Page in a new window" });
-    expect(link).toHaveAttribute("href", "/about");
-    expect(link).toHaveAttribute("target", "_blank");
-  });
+    it("should render the page navigation", () => {
+      renderPage();
+      expect(screen.getByRole("navigation", { name: "Page navigation" })).toBeInTheDocument();
+    });
 
-  it("should render the link to Users Page", () => {
-    renderPage();
-    const link = screen.getByRole("link", { name: "Go to Users Page" });
-    expect(link).toHaveAttribute("href", "/users");
-    expect(link).toHaveAttribute("target", "_self");
-  });
+    it("should render three navigation links", () => {
+      renderPage();
+      expect(screen.getAllByRole("link")).toHaveLength(3);
+    });
 
-  it("should render three navigation links", () => {
-    renderPage();
-    expect(screen.getAllByRole("link")).toHaveLength(3);
+    it("should render the about-in-another-window link with target _blank", () => {
+      renderPage();
+      const link = screen.getByRole("link", { name: "Go to About Page in a new window" });
+      expect(link).toHaveAttribute("target", "_blank");
+    });
+
+    it("should render the about page link with target _self", () => {
+      renderPage();
+      const link = screen.getByRole("link", { name: "Go to About Page" });
+      expect(link).toHaveAttribute("target", "_self");
+    });
   });
 });

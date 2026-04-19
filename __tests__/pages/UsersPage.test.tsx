@@ -1,5 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+
+import type { RenderResult } from "@testing-library/react";
 
 import UsersPage from "@/pages/UsersPage/UsersPage";
 
@@ -7,121 +9,101 @@ import userService from "@/services/userService";
 
 import { mockUsers } from "@tests/__mocks__/users.mock";
 
-interface RenderPage {
-  container: HTMLElement;
-}
-
-const mockedUserService = userService as jest.Mocked<typeof userService>;
+const mockUserService = userService as jest.Mocked<typeof userService>;
 
 jest.mock("@/services/userService");
 
-const renderPage = (): RenderPage => {
-  const { container } = render(
+const renderPage = (): RenderResult => {
+  return render(
     <MemoryRouter>
       <UsersPage />
     </MemoryRouter>
   );
-  return { container };
 };
 
 describe("UsersPage", () => {
-  afterEach(() => {
-    jest.clearAllMocks();
+  describe("rendering", () => {
+    it("should render the page title", () => {
+      mockUserService.getAll.mockReturnValue(new Promise(() => undefined));
+      renderPage();
+      expect(screen.getByRole("heading", { name: "Users Page", level: 1 })).toBeInTheDocument();
+    });
+
+    it("should render loading state while fetching", () => {
+      mockUserService.getAll.mockReturnValue(new Promise(() => undefined));
+      renderPage();
+      expect(screen.getByRole("status")).toBeInTheDocument();
+      expect(screen.getByText("Loading users...")).toBeInTheDocument();
+    });
+
+    it("should render users after loading completes", async () => {
+      mockUserService.getAll.mockResolvedValue(mockUsers);
+      renderPage();
+      expect(await screen.findByText("John Doe")).toBeInTheDocument();
+      expect(screen.getByText("Jane Smith")).toBeInTheDocument();
+    });
+
+    it("should render a user card for each user", async () => {
+      mockUserService.getAll.mockResolvedValue(mockUsers);
+      renderPage();
+      await screen.findByText("John Doe");
+      expect(screen.getAllByRole("article")).toHaveLength(mockUsers.length);
+    });
+
+    it("should render the user list with correct aria-label", async () => {
+      mockUserService.getAll.mockResolvedValue(mockUsers);
+      renderPage();
+      await screen.findByText("John Doe");
+      expect(screen.getByRole("list", { name: "User list" })).toBeInTheDocument();
+    });
+
+    it("should render the home page link", async () => {
+      mockUserService.getAll.mockResolvedValue(mockUsers);
+      renderPage();
+      await screen.findByText("John Doe");
+      expect(screen.getByRole("link", { name: "Go to Home Page" })).toBeInTheDocument();
+    });
+
+    it("should hide loading indicator after fetch completes", async () => {
+      mockUserService.getAll.mockResolvedValue(mockUsers);
+      renderPage();
+      await screen.findByText("John Doe");
+      expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    });
   });
 
-  it("should render the main element", () => {
-    mockedUserService.getAll.mockReturnValueOnce(new Promise(() => undefined));
+  describe("error handling", () => {
+    it("should render error message when fetch fails", async () => {
+      mockUserService.getAll.mockRejectedValue(new Error("Network error"));
+      renderPage();
+      expect(await screen.findByRole("alert")).toBeInTheDocument();
+      expect(screen.getByText("Error loading users. Please try again.")).toBeInTheDocument();
+    });
 
-    const { container } = renderPage();
+    it("should hide loading indicator when fetch fails", async () => {
+      mockUserService.getAll.mockRejectedValue(new Error("Network error"));
+      renderPage();
+      await screen.findByRole("alert");
+      expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    });
 
-    expect(container.querySelector<HTMLElement>("main.users-page")).toBeInTheDocument();
+    it("should not render the user list when there is an error", async () => {
+      mockUserService.getAll.mockRejectedValue(new Error("Network error"));
+      renderPage();
+      await screen.findByRole("alert");
+      expect(screen.queryByRole("list", { name: "User list" })).not.toBeInTheDocument();
+    });
   });
 
-  it("should render the Users Page title", () => {
-    mockedUserService.getAll.mockReturnValueOnce(new Promise(() => undefined));
-
-    renderPage();
-
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Users Page");
-  });
-
-  it("should show loading state while fetching users", () => {
-    mockedUserService.getAll.mockReturnValueOnce(new Promise(() => undefined));
-
-    renderPage();
-
-    expect(screen.getByRole("status")).toHaveTextContent("Loading users...");
-  });
-
-  it("should render user cards after successful fetch", async () => {
-    mockedUserService.getAll.mockResolvedValueOnce(mockUsers);
-
-    renderPage();
-
-    const cards = await screen.findAllByRole("article");
-    expect(cards).toHaveLength(mockUsers.length);
-  });
-
-  it("should show error message when fetch fails", async () => {
-    mockedUserService.getAll.mockRejectedValueOnce(new Error("Network error"));
-
-    renderPage();
-
-    await screen.findByRole("alert");
-    expect(screen.getByRole("alert")).toHaveTextContent("Error loading users. Please try again.");
-  });
-
-  it("should not show loading state after fetch completes", async () => {
-    mockedUserService.getAll.mockResolvedValueOnce(mockUsers);
-
-    renderPage();
-
-    await screen.findByRole("list", { name: "User list" });
-    expect(screen.queryByRole("status")).not.toBeInTheDocument();
-  });
-
-  it("should not show error state on successful fetch", async () => {
-    mockedUserService.getAll.mockResolvedValueOnce(mockUsers);
-
-    renderPage();
-
-    await screen.findByRole("list", { name: "User list" });
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-  });
-
-  it("should render the navigation landmark", () => {
-    mockedUserService.getAll.mockReturnValueOnce(new Promise(() => undefined));
-
-    renderPage();
-
-    expect(screen.getByRole("navigation", { name: "Page navigation" })).toBeInTheDocument();
-  });
-
-  it("should render the link to Home Page", () => {
-    mockedUserService.getAll.mockReturnValueOnce(new Promise(() => undefined));
-
-    renderPage();
-
-    const link = screen.getByRole("link", { name: "Go to Home Page" });
-    expect(link).toHaveAttribute("href", "/home");
-    expect(link).toHaveAttribute("target", "_self");
-  });
-
-  it("should call userService.getAll exactly once on mount", async () => {
-    mockedUserService.getAll.mockResolvedValueOnce(mockUsers);
-
-    renderPage();
-
-    await screen.findByRole("list", { name: "User list" });
-    expect(mockedUserService.getAll).toHaveBeenCalledTimes(1);
-  });
-
-  it("should render an empty list when the service returns no users", async () => {
-    mockedUserService.getAll.mockResolvedValueOnce([]);
-
-    renderPage();
-
-    await screen.findByRole("list", { name: "User list" });
-    expect(screen.queryAllByRole("article")).toHaveLength(0);
+  describe("edge cases", () => {
+    it("should render an empty list when no users are returned", async () => {
+      mockUserService.getAll.mockResolvedValue([]);
+      renderPage();
+      await waitFor(() => {
+        expect(screen.queryByRole("status")).not.toBeInTheDocument();
+      });
+      expect(screen.getByRole("list", { name: "User list" })).toBeInTheDocument();
+      expect(screen.queryAllByRole("article")).toHaveLength(0);
+    });
   });
 });

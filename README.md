@@ -1,4 +1,4 @@
-# Template Vite React TS
+# ReactTsViteBoilerplate
 
 ## Educational Purpose
 
@@ -17,7 +17,28 @@ The application will open automatically at `http://localhost:3000`
 
 ## Description
 
-Personal template for Vite React TypeScript projects.
+**ReactTsViteBoilerplate** is a production-ready starting point for building single-page applications with React, TypeScript, and Vite. It is not a UI kit or a framework — it is the foundation you clone once and stop rebuilding from scratch on every new project.
+
+**The problem it solves:** every React + TypeScript project starts with the same repetitive decisions — how to structure folders, how to wire up routing, where to put types, how to handle shared state without reaching for Redux, how to set up linting and formatting so they actually block bad code before it reaches the repo. This boilerplate answers all of those decisions upfront, with a consistent, lightweight architecture that scales to real applications without introducing unnecessary complexity.
+
+**What it includes:**
+
+- **Vite 7** as the build tool — instant dev server startup, fast HMR, and optimized production builds out of the box.
+- **React 19 + TypeScript 5** — strict typing enforced throughout; no `any`, explicit return types required, consistent type imports.
+- **React Router v7** with `HashRouter` for static-hosting compatibility. Includes a `PublicRoute` layout wrapper ready to be extended with authentication or role-based guards, and a configurable 404 / redirect behavior driven by an environment variable.
+- **Context + Provider + custom hook pattern** for shared state — demonstrated with a counter feature that shows how to scope a provider to a specific route, enforce provider usage at the type level, and expose a clean hook API without prop-drilling.
+- **Service layer** — plain async modules that wrap `fetch`, throw typed errors on non-ok responses, and keep all API communication out of components.
+- **Centralized type system** — all TypeScript interfaces live in `src/types/`, split by concern (props, states, contexts, hooks, domain models, env variables). Environment variables are parsed and typed once in `src/constants/envs.ts`; raw `import.meta.env` access does not spread across the codebase.
+- **Semantic HTML and accessibility** — components use `<article>`, `<address>`, `<nav>`, `<output aria-live>`, `role="status"`, `role="alert"`, and `rel="noopener noreferrer"` by default, not as an afterthought.
+- **Jest 30 + Testing Library** — full test suite with `ts-jest`, `jest-environment-jsdom`, `@testing-library/react`, and `@testing-library/user-event`. Tests mirror the `src/` structure, use a typed `renderComponent` / `renderPage` factory pattern, and cover happy paths, edge cases, async flows, and error states. Coverage threshold enforced at 70% across branches, functions, lines, and statements.
+- **ESLint + Prettier + Husky + lint-staged** — pre-commit hooks block commits with linting errors and auto-format staged files. No manual formatting steps required.
+
+**How to use it:**
+
+1. Clone the repository and install dependencies.
+2. Rename the project in `package.json` and update the HTML title in `index.html`.
+3. Set your environment variables following `.env.example`.
+4. Replace the template pages, components, services, and context with your own domain logic — the folder structure, routing setup, type conventions, and tooling stay exactly as they are.
 
 ## Technologies Used
 
@@ -86,7 +107,7 @@ Personal template for Vite React TypeScript projects.
 
 ## Portfolio Link
 
-[`https://www.diegolibonati.com.ar/#/project/Template-Vite-React-TS`](https://www.diegolibonati.com.ar/#/project/Template-Vite-React-TS)
+[`https://www.diegolibonati.com.ar/#/project/react-ts-vite-boilerplate`](https://www.diegolibonati.com.ar/#/project/react-ts-vite-boilerplate)
 
 ## Testing
 
@@ -114,7 +135,7 @@ VITE_TEMPLATE_API_URL=https://jsonplaceholder.typicode.com
 ## Project Structure
 
 ```
-Template-Vite-React-TS/
+react-ts-vite-boilerplate/
 ├── __tests__/                      # Test suite
 │   ├── __mocks__/                  # Shared mock data and module mocks
 │   ├── components/                 # Tests for reusable components

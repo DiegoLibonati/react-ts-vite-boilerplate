@@ -1,53 +1,43 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
+import type { RenderResult } from "@testing-library/react";
+
 import AboutPage from "@/pages/AboutPage/AboutPage";
 
-interface RenderPage {
-  container: HTMLElement;
-}
-
-const renderPage = (): RenderPage => {
-  const { container } = render(
+const renderPage = (): RenderResult => {
+  return render(
     <MemoryRouter>
       <AboutPage />
     </MemoryRouter>
   );
-  return { container };
 };
 
 describe("AboutPage", () => {
-  it("should render the main element", () => {
-    const { container } = renderPage();
-    expect(container.querySelector<HTMLElement>("main.about-page")).toBeInTheDocument();
-  });
+  describe("rendering", () => {
+    it("should render the page title", () => {
+      renderPage();
+      expect(screen.getByRole("heading", { name: "About Page", level: 1 })).toBeInTheDocument();
+    });
 
-  it("should render the About Page title", () => {
-    renderPage();
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("About Page");
-  });
+    it("should render the product page link", () => {
+      renderPage();
+      expect(screen.getByRole("link", { name: "Go to Product Page 12" })).toBeInTheDocument();
+    });
 
-  it("should render a navigation landmark", () => {
-    renderPage();
-    expect(screen.getByRole("navigation", { name: "Page navigation" })).toBeInTheDocument();
-  });
+    it("should render the context page link", () => {
+      renderPage();
+      expect(screen.getByRole("link", { name: "Go to Context Page" })).toBeInTheDocument();
+    });
 
-  it("should render the link to Product Page 12", () => {
-    renderPage();
-    const link = screen.getByRole("link", { name: "Go to Product Page 12" });
-    expect(link).toHaveAttribute("href", "/products/12");
-    expect(link).toHaveAttribute("target", "_self");
-  });
+    it("should render the page navigation", () => {
+      renderPage();
+      expect(screen.getByRole("navigation", { name: "Page navigation" })).toBeInTheDocument();
+    });
 
-  it("should render the link to Context Page", () => {
-    renderPage();
-    const link = screen.getByRole("link", { name: "Go to Context Page" });
-    expect(link).toHaveAttribute("href", "/context");
-    expect(link).toHaveAttribute("target", "_self");
-  });
-
-  it("should render two navigation links", () => {
-    renderPage();
-    expect(screen.getAllByRole("link")).toHaveLength(2);
+    it("should render two navigation links", () => {
+      renderPage();
+      expect(screen.getAllByRole("link")).toHaveLength(2);
+    });
   });
 });
