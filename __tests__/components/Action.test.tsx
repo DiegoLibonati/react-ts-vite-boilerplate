@@ -6,11 +6,13 @@ import type { ActionProps } from "@/types/props";
 
 import Action from "@/components/Action/Action";
 
+const mockOnClick = jest.fn();
+
 const renderComponent = (props: Partial<ActionProps> = {}): RenderResult => {
   const defaultProps: ActionProps = {
     id: "test-action",
     ariaLabel: "Test action",
-    onClick: jest.fn(),
+    onClick: mockOnClick,
     ...props,
   };
   return render(<Action {...defaultProps} />);
@@ -57,16 +59,14 @@ describe("Action", () => {
 
   describe("behavior", () => {
     it("should call onClick when clicked", async () => {
-      const mockOnClick = jest.fn();
-      renderComponent({ onClick: mockOnClick });
+      renderComponent();
       const user = userEvent.setup();
       await user.click(screen.getByRole("button"));
       expect(mockOnClick).toHaveBeenCalledTimes(1);
     });
 
     it("should not call onClick when onClick is not triggered", () => {
-      const mockOnClick = jest.fn();
-      renderComponent({ onClick: mockOnClick });
+      renderComponent();
       expect(mockOnClick).not.toHaveBeenCalled();
     });
   });

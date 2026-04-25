@@ -27,7 +27,7 @@ describe("ContextPage", () => {
 
     it("should render the counter starting at 0", () => {
       renderPage();
-      expect(screen.getByLabelText("Counter value: 0")).toBeInTheDocument();
+      expect(screen.getByRole("status", { name: "Counter value: 0" })).toBeInTheDocument();
     });
 
     it("should render the subtract button", () => {
@@ -56,14 +56,14 @@ describe("ContextPage", () => {
       renderPage();
       const user = userEvent.setup();
       await user.click(screen.getByRole("button", { name: "Add 1 to counter" }));
-      expect(screen.getByLabelText("Counter value: 1")).toBeInTheDocument();
+      expect(screen.getByRole("status", { name: "Counter value: 1" })).toBeInTheDocument();
     });
 
     it("should decrement counter when subtract button is clicked", async () => {
       renderPage();
       const user = userEvent.setup();
       await user.click(screen.getByRole("button", { name: "Subtract 1 from counter" }));
-      expect(screen.getByLabelText("Counter value: -1")).toBeInTheDocument();
+      expect(screen.getByRole("status", { name: "Counter value: -1" })).toBeInTheDocument();
     });
 
     it("should reflect multiple add and subtract operations correctly", async () => {
@@ -76,7 +76,7 @@ describe("ContextPage", () => {
       await user.click(addButton);
       await user.click(subtractButton);
 
-      expect(screen.getByLabelText("Counter value: 1")).toBeInTheDocument();
+      expect(screen.getByRole("status", { name: "Counter value: 1" })).toBeInTheDocument();
     });
 
     it("should allow counter to go negative", async () => {
@@ -84,7 +84,7 @@ describe("ContextPage", () => {
       const user = userEvent.setup();
       await user.click(screen.getByRole("button", { name: "Subtract 1 from counter" }));
       await user.click(screen.getByRole("button", { name: "Subtract 1 from counter" }));
-      expect(screen.getByLabelText("Counter value: -2")).toBeInTheDocument();
+      expect(screen.getByRole("status", { name: "Counter value: -2" })).toBeInTheDocument();
     });
   });
 });

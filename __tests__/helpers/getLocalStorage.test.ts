@@ -1,10 +1,10 @@
 import { getLocalStorage } from "@/helpers/getLocalStorage";
 
-beforeEach(() => {
-  localStorage.clear();
-});
-
 describe("getLocalStorage", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   it("should return null when key does not exist", () => {
     expect(getLocalStorage("nonExistentKey")).toBeNull();
   });
