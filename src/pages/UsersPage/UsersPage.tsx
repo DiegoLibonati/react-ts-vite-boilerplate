@@ -67,7 +67,7 @@ const UsersPage = (): JSX.Element => {
       <nav aria-label="Page navigation">
         <ul className="links">
           <li>
-            <Link id="link-home" ariaLabel="Go to Home Page" href="/home" target="_self">
+            <Link id="link-home" ariaLabel="Go to Home Page" href="/" target="_self">
               Go to Home Page
             </Link>
           </li>

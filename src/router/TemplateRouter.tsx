@@ -19,7 +19,7 @@ export const TemplateRouter = (): JSX.Element => {
   return (
     <Routes>
       <Route element={<PublicRoute />}>
-        <Route path="/home" element={<HomePage></HomePage>}></Route>
+        <Route path="/" element={<HomePage></HomePage>}></Route>
         <Route path="/about" element={<AboutPage></AboutPage>}></Route>
         <Route path="/users" element={<UsersPage></UsersPage>}></Route>
         <Route path="/products/:productId" element={<ProductPage></ProductPage>}></Route>
@@ -36,7 +36,7 @@ export const TemplateRouter = (): JSX.Element => {
 
       <Route
         path="/*"
-        element={<Navigate to={envs.redirectIfRouteNotExists ? "/home" : "/error"}></Navigate>}
+        element={<Navigate to={envs.redirectIfRouteNotExists ? "/" : "/error"}></Navigate>}
       ></Route>
     </Routes>
   );
