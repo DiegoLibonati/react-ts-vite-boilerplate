@@ -47,6 +47,8 @@ The application will open automatically at `http://localhost:3000`
 3. Vite
 4. HTML5
 5. CSS3
+6. Docker
+7. Nginx
 
 ## Libraries Used
 
@@ -120,6 +122,56 @@ For coverage report:
 ```bash
 npm run test:coverage
 ```
+
+## Production
+
+The production setup uses a **multi-stage Docker build** served by **nginx** running as a **non-root user** (`appuser`, UID 1001).
+
+### Architecture
+
+```
+Stage 1 — builder : node:22-alpine  →  npm ci  →  npm run build  →  dist/
+Stage 2 — runner  : nginx:stable-alpine  →  serves dist/ on port 8080
+```
+
+No Node.js or source code ends up in the final image — only nginx and the compiled static files.
+
+### Run with Docker Compose
+
+```bash
+docker compose -f prod.docker-compose.yml up --build
+```
+
+The app is available at `http://localhost:3000` (host port 3000 → container port 8080).
+
+### Build and run manually
+
+```bash
+docker build -f Dockerfile.production -t my-app:prod .
+docker run -p 3000:8080 my-app:prod
+```
+
+### What the production image includes
+
+| Feature                  | Detail                                                                                                               |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| **Non-root execution**   | nginx runs as `appuser` (UID 1001); port 8080 avoids privileged binding                                              |
+| **Gzip compression**     | Enabled for JS, CSS, JSON, SVG, and font files ≥ 1 KB                                                                |
+| **Static asset caching** | JS, CSS, images, and fonts served with `Cache-Control: public, max-age=31536000, immutable`                          |
+| **SPA routing**          | All unmatched paths fall through to `index.html` so React Router handles navigation client-side                      |
+| **API proxy**            | Requests to `/users` are proxied to the upstream API — no direct cross-origin requests from the browser              |
+| **Security headers**     | `X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin` |
+| **Health check**         | Docker polls `http://localhost:8080` every 30 s (3 retries, 5 s timeout, 10 s start grace)                           |
+
+### Development with Docker
+
+A separate Compose file is provided for local development with hot-module replacement:
+
+```bash
+docker compose -f dev.docker-compose.yml up --build
+```
+
+Source files are bind-mounted into the container so changes reflect immediately without rebuilding. `node_modules` is kept in an anonymous volume to avoid conflicts with host-installed binaries.
 
 ## Env Keys
 
