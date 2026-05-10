@@ -6,15 +6,6 @@ This project was created primarily for **educational and learning purposes**.
 While it is well-structured and could technically be used in production, it is **not intended for commercialization**.  
 The main goal is to explore and demonstrate best practices, patterns, and technologies in software development.
 
-## Getting Started
-
-1. Clone the repository
-2. Navigate to the project folder
-3. Execute: `npm install`
-4. Execute: `npm run dev`
-
-The application will open automatically at `http://localhost:3000`
-
 ## Description
 
 **React Ts Vite Boilerplate** is a production-ready starting point for building single-page applications with React, TypeScript, and Vite. It is not a UI kit or a framework — it is the foundation you clone once and stop rebuilding from scratch on every new project.
@@ -90,95 +81,71 @@ The application will open automatically at `http://localhost:3000`
 "vite": "^7.1.6"
 ```
 
-## Available Scripts
+## Getting Started
 
-| Command                 | Description                   |
-| ----------------------- | ----------------------------- |
-| `npm run dev`           | Start development server      |
-| `npm run build`         | Build for production          |
-| `npm run preview`       | Preview production build      |
-| `npm run test`          | Run tests                     |
-| `npm run test:watch`    | Run tests in watch mode       |
-| `npm run test:coverage` | Run tests with coverage       |
-| `npm run lint`          | Check for linting errors      |
-| `npm run lint:fix`      | Fix linting errors            |
-| `npm run lint:all`      | Fix linting all (src - tests) |
-| `npm run format`        | Format code with Prettier     |
-| `npm run format:check`  | Check code formatting         |
-| `npm run format:all`    | Format Prettier (src - tests) |
-| `npm run doctor`        | Run React Doctor health check |
+With the stack and dependencies in mind, set up the project locally:
 
-## Portfolio Link
+1. Clone the repository.
+2. Navigate to the project folder.
+3. Install dependencies:
 
-[`https://www.diegolibonati.com.ar/#/project/react-ts-vite-boilerplate`](https://www.diegolibonati.com.ar/#/project/react-ts-vite-boilerplate)
+   ```bash
+   npm install
+   ```
 
-## Testing
+4. Copy the example env file and adjust values for your environment (see [Env Keys](#env-keys) for the available variables):
 
-1. Navigate to the project folder
-2. Execute: `npm test`
+   ```bash
+   cp .env.example .env
+   ```
 
-For coverage report:
+5. Start the development server:
 
-```bash
-npm run test:coverage
-```
+   ```bash
+   npm run dev
+   ```
 
-## Production
+The application will open automatically at `http://localhost:3000`.
 
-The production setup uses a **multi-stage Docker build** served by **nginx** running as a **non-root user** (`appuser`, UID 1001).
+### Pre-Commit for Development
 
-### Architecture
+Before committing, the project enforces code quality through pre-commit hooks. Husky runs `lint-staged` on every commit, which executes ESLint on staged `.ts`/`.tsx` files and Prettier on `.ts`, `.tsx`, `.css`, `.json` and `.md` files. Commits with linting errors are blocked.
 
-```
-Stage 1 — builder : node:22-alpine  →  npm ci  →  npm run build  →  dist/
-Stage 2 — runner  : nginx:stable-alpine  →  serves dist/ on port 8080
-```
+**ESLint** is configured with TypeScript strict rules:
 
-No Node.js or source code ends up in the final image — only nginx and the compiled static files.
+- Explicit return types required
+- No `any` type allowed
+- Consistent type imports
+- No unused variables
 
-### Run with Docker Compose
+**Prettier** enforces consistent formatting:
 
-```bash
-docker compose -f prod.docker-compose.yml up --build
-```
+- 2 spaces indentation
+- Semicolons required
+- Double quotes
+- Trailing commas (ES5)
 
-The app is available at `http://localhost:3000` (host port 3000 → container port 8080).
+You can also run the tools manually outside of the commit flow:
 
-### Build and run manually
-
-```bash
-docker build -f Dockerfile.production -t my-app:prod .
-docker run -p 3000:8080 my-app:prod
-```
-
-### What the production image includes
-
-| Feature                  | Detail                                                                                                               |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------- |
-| **Non-root execution**   | nginx runs as `appuser` (UID 1001); port 8080 avoids privileged binding                                              |
-| **Gzip compression**     | Enabled for JS, CSS, JSON, SVG, and font files ≥ 1 KB                                                                |
-| **Static asset caching** | JS, CSS, images, and fonts served with `Cache-Control: public, max-age=31536000, immutable`                          |
-| **SPA routing**          | All unmatched paths fall through to `index.html` so React Router handles navigation client-side                      |
-| **API proxy**            | Requests to `/users` are proxied to the upstream API — no direct cross-origin requests from the browser              |
-| **Security headers**     | `X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin` |
-| **Health check**         | Docker polls `http://localhost:8080` every 30 s (3 retries, 5 s timeout, 10 s start grace)                           |
-
-### Development with Docker
-
-A separate Compose file is provided for local development with hot-module replacement:
-
-```bash
-docker compose -f dev.docker-compose.yml up --build
-```
-
-Source files are bind-mounted into the container so changes reflect immediately without rebuilding. `node_modules` is kept in an anonymous volume to avoid conflicts with host-installed binaries.
+| Command                | Description                   |
+| ---------------------- | ----------------------------- |
+| `npm run lint`         | Check for linting errors      |
+| `npm run lint:fix`     | Fix linting errors            |
+| `npm run lint:all`     | Fix linting all (src + tests) |
+| `npm run format`       | Format code with Prettier     |
+| `npm run format:check` | Check code formatting         |
+| `npm run format:all`   | Format Prettier (src + tests) |
 
 ## Env Keys
+
+Environment variables are parsed and typed once in `src/constants/envs.ts`; raw `import.meta.env` access is not allowed elsewhere in the codebase.
 
 | Key                                 | Description                                                                        |
 | ----------------------------------- | ---------------------------------------------------------------------------------- |
 | `VITE_REDIRECT_IF_ROUTE_NOT_EXISTS` | If `true`, redirects to home when route doesn't exist. If `false`, shows 404 page. |
 | `VITE_TEMPLATE_API_URL`             | Users API URL.                                                                     |
+
+Example `.env`:
 
 ```bash
 VITE_REDIRECT_IF_ROUTE_NOT_EXISTS=false
@@ -186,6 +153,8 @@ VITE_TEMPLATE_API_URL=https://jsonplaceholder.typicode.com
 ```
 
 ## Project Structure
+
+With the app running and configured, here is how the source is organized:
 
 ```
 react-ts-vite-boilerplate/
@@ -264,6 +233,8 @@ react-ts-vite-boilerplate/
 
 ## Architecture & Design Patterns
 
+The folder structure above maps directly onto the architectural layers described in this section.
+
 ### Component Architecture
 
 The UI is split into two layers:
@@ -327,7 +298,7 @@ Components use semantic elements over generic `<div>` wrappers:
 - `rel="noopener noreferrer"` on all `target="_blank"` links.
 - `type="button"` on every `<button>` to prevent accidental form submission.
 
-### Testing Strategy
+## Testing
 
 Tests mirror the `src/` folder structure under `__tests__/`. Each test file follows the **`renderComponent` / `renderPage` factory pattern**: a typed helper sets up the component with default props (drawn from shared mocks) and accepts overrides. This keeps individual tests short and focused on a single assertion.
 
@@ -336,35 +307,19 @@ Tests mirror the `src/` folder structure under `__tests__/`. Each test file foll
 - **Services** — `globalThis.fetch` is mocked as `jest.fn()` via the Jest setup file.
 - **Async assertions** — prefer `findBy*` over `waitFor(() => expect(getBy*...))`.
 
-## Code Quality Tools
+Coverage threshold is enforced at **70%** across branches, functions, lines, and statements.
 
-### ESLint
+### Run tests
 
-Configured with TypeScript strict rules:
+| Command                 | Description                    |
+| ----------------------- | ------------------------------ |
+| `npm run test`          | Run tests once                 |
+| `npm run test:watch`    | Run tests in watch mode        |
+| `npm run test:coverage` | Run tests with coverage report |
 
-- Explicit return types required
-- No `any` type allowed
-- Consistent type imports
-- No unused variables
+## Security Audit
 
-### Prettier
-
-Automatic code formatting:
-
-- 2 spaces indentation
-- Semicolons required
-- Double quotes
-- Trailing commas (ES5)
-
-### Husky + lint-staged
-
-Pre-commit hooks that automatically:
-
-- Run ESLint on staged `.ts` and `.tsx` files
-- Format `.ts`, `.tsx`, `.css`, `.json` and `.md` files with Prettier
-- Block commits with linting errors
-
-## Security
+Once the test suite is green, audit dependencies and run the project health check before building.
 
 ### npm audit
 
@@ -388,6 +343,86 @@ Use `--verbose` to see specific files and line numbers:
 npm run doctor -- --verbose
 ```
 
+## Build
+
+With tests passing and the security audit clean, generate an optimized production bundle:
+
+```bash
+npm run build
+```
+
+Vite outputs the compiled static assets to `dist/`. To verify the build locally before deploying:
+
+```bash
+npm run preview
+```
+
+`preview` serves the contents of `dist/` on a local port so you can confirm the production bundle behaves as expected.
+
+## Production
+
+Production deploys the contents of `dist/` using a **multi-stage Docker image** served by **nginx** running as a **non-root user** (`appuser`, UID 1001). Before promoting an image, make sure you have already run [Testing](#testing), [Security Audit](#security-audit), and [Build](#build) — this section only covers what is **new** to the production pipeline: production env config and Docker distribution.
+
+### Configure production env
+
+Create a production env file based on `.env.example` and adjust values for the target environment:
+
+```bash
+cp .env.example .env.production
+```
+
+Vite reads these variables at compile time during `npm run build` and bakes the parsed values into the static bundle.
+
+### Architecture
+
+```
+Stage 1 — builder : node:22-alpine  →  npm ci  →  npm run build  →  dist/
+Stage 2 — runner  : nginx:stable-alpine  →  serves dist/ on port 8080
+```
+
+No Node.js or source code ends up in the final image — only nginx and the compiled static files.
+
+### Run with Docker Compose (Prod)
+
+```bash
+docker compose -f prod.docker-compose.yml up --build
+```
+
+The app is available at `http://localhost:3000` (host port 3000 → container port 8080).
+
+### Build and run manually (Prod)
+
+```bash
+docker build -f Dockerfile.production -t my-app:prod .
+docker run -p 3000:8080 my-app:prod
+```
+
+### What the production image includes
+
+| Feature                  | Detail                                                                                                               |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| **Non-root execution**   | nginx runs as `appuser` (UID 1001); port 8080 avoids privileged binding                                              |
+| **Gzip compression**     | Enabled for JS, CSS, JSON, SVG, and font files ≥ 1 KB                                                                |
+| **Static asset caching** | JS, CSS, images, and fonts served with `Cache-Control: public, max-age=31536000, immutable`                          |
+| **SPA routing**          | All unmatched paths fall through to `index.html` so React Router handles navigation client-side                      |
+| **API proxy**            | Requests to `/users` are proxied to the upstream API — no direct cross-origin requests from the browser              |
+| **Security headers**     | `X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin` |
+| **Health check**         | Docker polls `http://localhost:8080` every 30 s (3 retries, 5 s timeout, 10 s start grace)                           |
+
+### Development with Docker (Dev)
+
+A separate Compose file is provided for local development with hot-module replacement, as an alternative to the local `npm run dev` flow described in [Getting Started](#getting-started):
+
+```bash
+docker compose -f dev.docker-compose.yml up --build
+```
+
+Source files are bind-mounted into the container so changes reflect immediately without rebuilding. `node_modules` is kept in an anonymous volume to avoid conflicts with host-installed binaries.
+
 ## Known Issues
 
 None at the moment.
+
+## Portfolio Link
+
+[`https://www.diegolibonati.com.ar/#/project/react-ts-vite-boilerplate`](https://www.diegolibonati.com.ar/#/project/react-ts-vite-boilerplate)
