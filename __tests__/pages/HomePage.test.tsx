@@ -1,7 +1,10 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 
 import type { RenderResult } from "@testing-library/react";
+
+import ErrorBoundary from "@/components/ErrorBoundary/ErrorBoundary";
 
 import HomePage from "@/pages/HomePage/HomePage";
 
@@ -57,6 +60,33 @@ describe("HomePage", () => {
       renderPage();
       const link = screen.getByRole("link", { name: "Go to About Page" });
       expect(link).toHaveAttribute("target", "_self");
+    });
+
+    it("should render the trigger error boundary button", () => {
+      renderPage();
+      expect(screen.getByRole("button", { name: "Trigger error boundary" })).toBeInTheDocument();
+    });
+  });
+
+  describe("behavior", () => {
+    beforeEach(() => {
+      jest.spyOn(console, "error").mockImplementation(() => undefined);
+    });
+
+    it("should trigger the error boundary when the button is clicked", async () => {
+      const user = userEvent.setup();
+      render(
+        <MemoryRouter>
+          <ErrorBoundary>
+            <HomePage />
+          </ErrorBoundary>
+        </MemoryRouter>
+      );
+
+      await user.click(screen.getByRole("button", { name: "Trigger error boundary" }));
+
+      expect(screen.getByRole("alert")).toBeInTheDocument();
+      expect(screen.getByText("Something went wrong")).toBeInTheDocument();
     });
   });
 });

@@ -21,7 +21,7 @@ The main goal is to explore and demonstrate best practices, patterns, and techno
 - **Service layer** — plain async modules that wrap `fetch`, throw typed errors on non-ok responses, and keep all API communication out of components.
 - **Centralized type system** — all TypeScript interfaces live in `src/types/`, split by concern (props, states, contexts, hooks, domain models, env variables). Environment variables are parsed and typed once in `src/constants/envs.ts`; raw `import.meta.env` access does not spread across the codebase.
 - **Semantic HTML and accessibility** — components use `<article>`, `<address>`, `<nav>`, `<output aria-live>`, `role="status"`, `role="alert"`, and `rel="noopener noreferrer"` by default, not as an afterthought.
-- **Jest 30 + Testing Library** — full test suite with `ts-jest`, `jest-environment-jsdom`, `@testing-library/react`, and `@testing-library/user-event`. Tests mirror the `src/` structure, use a typed `renderComponent` / `renderPage` factory pattern, and cover happy paths, edge cases, async flows, and error states. Coverage threshold enforced at 70% across branches, functions, lines, and statements.
+- **Jest 30 + Testing Library + MSW** — full test suite with `ts-jest`, `jest-environment-jsdom`, `@testing-library/react`, `@testing-library/user-event`, and MSW v2 for network-level HTTP mocking. Tests mirror the `src/` structure, use a typed `renderComponent` / `renderPage` factory pattern, and cover happy paths, edge cases, async flows, and error states. Coverage threshold enforced at 70% across branches, functions, lines, and statements.
 - **ESLint + Prettier + Husky + lint-staged** — pre-commit hooks block commits with linting errors and auto-format staged files. No manual formatting steps required.
 
 **How to use it:**
@@ -30,6 +30,11 @@ The main goal is to explore and demonstrate best practices, patterns, and techno
 2. Rename the project in `package.json` and update the HTML title in `index.html`.
 3. Set your environment variables following `.env.example`.
 4. Replace the template pages, components, services, and context with your own domain logic — the folder structure, routing setup, type conventions, and tooling stay exactly as they are.
+5. Replace placeholder values before deploying:
+   - `your-site.com` → your real domain in `public/robots.txt` (sitemap URL) and `index.html` (`og:url`)
+   - `@your-user` → your Twitter/X handle in `index.html` (`twitter:creator`)
+   - `Diego Libonati` → your name in `index.html` (`<meta name="author">`)
+   - `start_url` in `public/manifest.json` → your app's base path if not `/`
 
 ## Technologies Used
 
@@ -74,10 +79,12 @@ The main goal is to explore and demonstrate best practices, patterns, and techno
 "jest": "^30.3.0"
 "jest-environment-jsdom": "^30.3.0"
 "lint-staged": "^15.0.0"
+"msw": "^2.10.4"
 "prettier": "^3.0.0"
 "ts-jest": "^29.4.6"
 "typescript": "^5.2.2"
 "typescript-eslint": "^8.0.0"
+"undici": "^7.25.0"
 "vite": "^7.1.6"
 ```
 
@@ -110,6 +117,8 @@ The application will open automatically at `http://localhost:3000`.
 ### Pre-Commit for Development
 
 Before committing, the project enforces code quality through pre-commit hooks. Husky runs `lint-staged` on every commit, which executes ESLint on staged `.ts`/`.tsx` files and Prettier on `.ts`, `.tsx`, `.css`, `.json` and `.md` files. Commits with linting errors are blocked.
+
+After `npm install`, the `prepare` script automatically runs `husky` to install the Git hooks in `.husky/`. If hooks are not active after a fresh clone, run `npm run prepare` manually.
 
 **ESLint** is configured with TypeScript strict rules:
 
@@ -165,7 +174,9 @@ react-ts-vite-boilerplate/
 │   ├── helpers/                    # Tests for helper functions
 │   ├── pages/                      # Tests for page components
 │   ├── services/                   # Tests for service modules
-│   └── jest.setup.ts               # Jest global setup (jest-dom, polyfills, fetch mock)
+│   ├── jest.setup.ts               # Jest global setup (jest-dom matchers, MSW lifecycle)
+│   ├── jest.polyfills.ts           # Node Web API polyfills required by MSW
+│   └── jest.polyfills-undici.ts    # fetch/Request/Response polyfills via undici for MSW
 ├── public/                         # Static assets served as-is
 │   ├── favicon.ico
 │   ├── manifest.json
@@ -214,7 +225,7 @@ react-ts-vite-boilerplate/
 ├── index.html                      # HTML entry point
 ├── jest.config.js                  # Jest configuration
 ├── tsconfig.json                   # TypeScript compiler config
-└── vite.config.js                  # Vite build config
+└── vite.config.ts                  # Vite build config
 ```
 
 | Folder / File          | Description                                                         |
@@ -303,8 +314,8 @@ Components use semantic elements over generic `<div>` wrappers:
 Tests mirror the `src/` folder structure under `__tests__/`. Each test file follows the **`renderComponent` / `renderPage` factory pattern**: a typed helper sets up the component with default props (drawn from shared mocks) and accepts overrides. This keeps individual tests short and focused on a single assertion.
 
 - **Components** — rendered in isolation, assertions on DOM structure and accessible roles.
-- **Pages** — wrapped in `MemoryRouter` (and providers where needed); services are mocked with `jest.mock`.
-- **Services** — `globalThis.fetch` is mocked as `jest.fn()` via the Jest setup file.
+- **Pages** — wrapped in `MemoryRouter` (and providers where needed); services are mocked with `jest.mock` so HTTP never leaves the process.
+- **Services** — tested against a real MSW server (`setupServer`) that intercepts at the network level. Default handlers live in `__mocks__/mswHandlers.mock.ts`; per-test overrides use `mockMswServer.use(...)`.
 - **Async assertions** — prefer `findBy*` over `waitFor(() => expect(getBy*...))`.
 
 Coverage threshold is enforced at **70%** across branches, functions, lines, and statements.

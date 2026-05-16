@@ -1,10 +1,19 @@
+import { useState } from "react";
+
 import type { JSX } from "react";
 
+import Action from "@/components/Action/Action";
 import Link from "@/components/Link/Link";
 
 import "@/pages/HomePage/HomePage.css";
 
 const HomePage = (): JSX.Element => {
+  const [shouldThrow, setShouldThrow] = useState(false);
+
+  const ThrowError = (): never => {
+    throw new Error("Error boundary triggered manually.");
+  };
+
   return (
     <main className="home-page">
       <h1 className="title">Home Page</h1>
@@ -32,6 +41,21 @@ const HomePage = (): JSX.Element => {
           </li>
         </ul>
       </nav>
+
+      <section className="home-page__demo" aria-label="Error boundary demo">
+        <Action
+          id="action-trigger-error"
+          ariaLabel="Trigger error boundary"
+          className="home-page__demo-action"
+          onClick={() => {
+            setShouldThrow(true);
+          }}
+        >
+          Trigger Error Boundary
+        </Action>
+
+        {shouldThrow ? <ThrowError /> : null}
+      </section>
     </main>
   );
 };

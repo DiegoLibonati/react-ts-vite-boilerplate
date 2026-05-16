@@ -33,4 +33,9 @@ describe("getLocalStorage", () => {
     localStorage.setItem("arrKey", JSON.stringify([1, 2, 3]));
     expect(getLocalStorage("arrKey")).toEqual([1, 2, 3]);
   });
+
+  it("should return null when the stored value is invalid JSON", () => {
+    localStorage.setItem("badKey", "not-valid-json{{{");
+    expect(getLocalStorage("badKey")).toBeNull();
+  });
 });
