@@ -370,6 +370,61 @@ npm run preview
 
 `preview` serves the contents of `dist/` on a local port so you can confirm the production bundle behaves as expected.
 
+## Continuous Integration
+
+The repository ships with a **GitHub Actions** pipeline defined in [`.github/workflows/ci.yml`](.github/workflows/ci.yml). It runs automatically on every `push` and `pull_request` targeting the `main` branch, and gates merges by chaining the same quality checks you run locally — linting, type-checking, tests, the production bundle, and the Docker images.
+
+### Pipeline overview
+
+```
+                ┌─── PR or push to main ───┐
+                ▼                          ▼
+┌──────────────────────┐  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
+│    lint-and-audit    │─▶│      testing     │─▶│       build      │─▶│    build-docker  │
+│  npm lint · tsc -b   │  │     npm test     │  │     npm build    │  │   dev + prod img │
+└──────────────────────┘  └──────────────────┘  └──────────────────┘  └──────────────────┘
+```
+
+Each job runs on `ubuntu-latest`, reuses the Node version declared in [`.nvmrc`](.nvmrc), and caches `npm` between runs via `actions/setup-node@v4`. Jobs run sequentially through `needs:` — if linting fails, tests do not run; if tests fail, the build is not attempted; if the build fails, Docker images are not produced.
+
+### Validation jobs
+
+1. **`lint-and-audit`** — installs deps with `npm ci`, then runs `npm run lint` (ESLint with the strict TypeScript config) and `npm run type-check` (`tsc --noEmit`). This is the same gate that pre-commit enforces locally, repeated in CI to catch anything that bypassed Husky.
+2. **`testing`** — runs `npm run test`, which executes the full Jest suite (components, pages, services, helpers, constants) with the 70% coverage threshold enforced. MSW intercepts network calls inside the runner, so no real HTTP traffic leaves the job.
+3. **`build`** — runs `npm run build` to confirm the production bundle compiles cleanly from a fresh `npm ci`. Catches type-only regressions that `tsc --noEmit` and tests can miss, plus any Vite build-time failures (asset resolution, env parsing, etc.).
+4. **`build-docker`** — builds both `Dockerfile.development` (tagged `app:dev`) and `Dockerfile.production` (tagged `app:prod`) to verify the Compose flows described in [Production](#production) still work end-to-end. Images are built inside the runner and discarded — nothing is pushed to a registry.
+
+### Running the same checks locally
+
+Before pushing, you can replicate the full pipeline locally to avoid round-trips with the CI:
+
+```bash
+# lint-and-audit
+npm run lint
+npm run type-check
+
+# testing
+npm run test
+
+# build
+npm run build
+
+# build-docker
+docker build -f Dockerfile.development -t app:dev .
+docker build -f Dockerfile.production -t app:prod .
+```
+
+### Where the CI output lives
+
+| Output                        | Location                                                   |
+| ----------------------------- | ---------------------------------------------------------- |
+| Validation logs (lint, types) | **Actions** tab on GitHub                                  |
+| Test results & coverage logs  | **Actions** tab on GitHub                                  |
+| Production bundle             | Ephemeral, inside the runner (not uploaded as an artifact) |
+| Docker images                 | Ephemeral, inside the runner (not pushed to a registry)    |
+
+> **Note:** the pipeline is intentionally scoped to validation only. There is no release job, no tagging, and no artifact publishing — the boilerplate is meant to be cloned and adapted, so version management and distribution belong to the consuming project.
+
 ## Production
 
 Production deploys the contents of `dist/` using a **multi-stage Docker image** served by **nginx** running as a **non-root user** (`appuser`, UID 1001). Before promoting an image, make sure you have already run [Testing](#testing), [Security Audit](#security-audit), and [Build](#build) — this section only covers what is **new** to the production pipeline: production env config and Docker distribution.
