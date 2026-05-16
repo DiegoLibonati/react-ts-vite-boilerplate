@@ -12,8 +12,8 @@ export default defineConfig(({ mode }): UserConfig => {
     plugins: [react()],
     resolve: {
       alias: {
-        "@": path.resolve(__dirname, "./src"),
-        "@tests": path.resolve(__dirname, "./__tests__"),
+        "@": path.resolve(import.meta.dirname, "./src"),
+        "@tests": path.resolve(import.meta.dirname, "./__tests__"),
       },
     },
     server: {
