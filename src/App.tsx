@@ -1,6 +1,6 @@
-import type { JSX } from "react";
-
 import { HashRouter } from "react-router-dom";
+
+import type { JSX } from "react";
 
 import ErrorBoundary from "@/components/ErrorBoundary/ErrorBoundary";
 

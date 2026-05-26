@@ -20,7 +20,7 @@ class ErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBoundaryStat
     console.error("ErrorBoundary caught an error:", error, info);
   }
 
-  override render(): JSX.Element {
+  override render(): React.ReactNode {
     if (this.state.hasError) {
       return (
         <div className="error-boundary" role="alert">
@@ -39,12 +39,12 @@ class ErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBoundaryStat
       );
     }
 
-    return <>{this.props.children}</>;
+    return this.props.children;
   }
 }
 
-function ErrorBoundary({ children }: ErrorBoundaryProps): JSX.Element {
+const ErrorBoundary = ({ children }: ErrorBoundaryProps): JSX.Element => {
   return <ErrorBoundaryClass>{children}</ErrorBoundaryClass>;
-}
+};
 
 export default ErrorBoundary;
