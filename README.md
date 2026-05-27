@@ -289,7 +289,7 @@ Providers are scoped at the router level so only the routes that need them pay t
 React Router v7 with `HashRouter` (compatible with static hosting). Route structure:
 
 - `PublicRoute` wraps all pages as a layout route via `<Outlet />`, ready to be extended with auth or other guards.
-- A catch-all `/*` route redirects based on the `VITE_REDIRECT_IF_ROUTE_NOT_EXISTS` env flag — either to `/home` or to the `/error` page — making the 404 behavior configurable without code changes.
+- A catch-all `/*` route redirects based on the `VITE_REDIRECT_IF_ROUTE_NOT_EXISTS` env flag — either to `/home` or to the `/not-found` page — making the 404 behavior configurable without code changes.
 
 ### Service Layer
 

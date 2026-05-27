@@ -31,12 +31,12 @@ export const TemplateRouter = (): JSX.Element => {
             </CounterProvider>
           }
         ></Route>
-        <Route path="/error" element={<NotFoundPage></NotFoundPage>}></Route>
+        <Route path="/not-found" element={<NotFoundPage></NotFoundPage>}></Route>
       </Route>
 
       <Route
         path="/*"
-        element={<Navigate to={envs.redirectIfRouteNotExists ? "/" : "/error"}></Navigate>}
+        element={<Navigate to={envs.redirectIfRouteNotExists ? "/" : "/not-found"}></Navigate>}
       ></Route>
     </Routes>
   );
