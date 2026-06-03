@@ -1,4 +1,4 @@
-import { Link as LinkRouter } from "react-router-dom";
+import { Link as LinkRouter } from "react-router";
 
 import type { JSX } from "react";
 import type { LinkProps } from "@/types/props";

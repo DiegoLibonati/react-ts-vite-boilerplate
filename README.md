@@ -53,7 +53,7 @@ The main goal is to explore and demonstrate best practices, patterns, and techno
 ```
 "react": "^19.2.4"
 "react-dom": "^19.2.4"
-"react-router-dom": "7.13.2"
+"react-router": "7.16.0"
 ```
 
 ### DevDependencies
