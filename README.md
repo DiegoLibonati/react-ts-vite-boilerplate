@@ -1,4 +1,4 @@
-# React Ts Vite Boilerplate
+# React Vite Boilerplate
 
 ## Educational Purpose
 
@@ -8,7 +8,7 @@ The main goal is to explore and demonstrate best practices, patterns, and techno
 
 ## Description
 
-**React Ts Vite Boilerplate** is a production-ready starting point for building single-page applications with React, TypeScript, and Vite. It is not a UI kit or a framework — it is the foundation you clone once and stop rebuilding from scratch on every new project.
+**React Vite Boilerplate** is a production-ready starting point for building single-page applications with React, TypeScript, and Vite. It is not a UI kit or a framework — it is the foundation you clone once and stop rebuilding from scratch on every new project.
 
 **The problem it solves:** every React + TypeScript project starts with the same repetitive decisions — how to structure folders, how to wire up routing, where to put types, how to handle shared state without reaching for Redux, how to set up linting and formatting so they actually block bad code before it reaches the repo. This boilerplate answers all of those decisions upfront, with a consistent, lightweight architecture that scales to real applications without introducing unnecessary complexity.
 
@@ -166,7 +166,7 @@ VITE_TEMPLATE_API_URL=https://jsonplaceholder.typicode.com
 With the app running and configured, here is how the source is organized:
 
 ```
-react-ts-vite-boilerplate/
+react-vite-boilerplate/
 ├── __tests__/                      # Test suite
 │   ├── __mocks__/                  # Shared mock data and module mocks
 │   ├── components/                 # Tests for reusable components
@@ -491,4 +491,4 @@ None at the moment.
 
 ## Portfolio Link
 
-[`https://www.diegolibonati.com.ar/#/project/react-ts-vite-boilerplate`](https://www.diegolibonati.com.ar/#/project/react-ts-vite-boilerplate)
+[`https://www.diegolibonati.com.ar/#/project/react-vite-boilerplate`](https://www.diegolibonati.com.ar/#/project/react-vite-boilerplate)

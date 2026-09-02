@@ -1,7 +1,7 @@
 {
-  "name": "React Ts Vite Boilerplate",
-  "short_name": "React Ts Vite Boilerplate",
-  "description": "React Ts Vite Boilerplate is a production-ready starting point for building single-page applications with React, TypeScript, and Vite.",
+  "name": "React Vite Boilerplate",
+  "short_name": "React Vite Boilerplate",
+  "description": "React Vite Boilerplate is a production-ready starting point for building single-page applications with React, TypeScript, and Vite.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
